@@ -15,7 +15,7 @@
 # $monit_alert="someone@example.org"
 # $monit_mailserver="mail.example.org"
 # $monit_pool_interval="120"
-# 
+#
 # include monit
 #
 # The following is a list of the currently available variables:
@@ -65,19 +65,20 @@ class monit {
 	package { "monit":
 		ensure => installed,
 	}
-	
+
 	# The service
 	service { "monit":
 		ensure  => running,
 		require => Package["monit"],
 	}
-	
+
 	# How to tell monit to reload its configuration
 	exec { "monit reload":
-		command     => "/usr/sbin/monit reload",
-		refreshonly => true,
+		provider	=> shell,
+		command		=> "`which monit` reload",
+		refreshonly	=> true,
 	}
-	
+
 	# Default values for all file resources
 	File {
 		owner   => "root",
@@ -86,7 +87,7 @@ class monit {
 		notify  => Exec["monit reload"],
 		require => Package["monit"],
 	}
-	
+
 	# The main configuration directory, this should have been provided by
 	# the "monit" package, but we include it just to be sure.
 	file { "/etc/monit":
