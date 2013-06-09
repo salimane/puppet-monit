@@ -23,19 +23,32 @@
 #   }
 # (end)
 define monit::snippet (
-	$ensure  = present,
-	$target  = '',
-	$source  = '',
-	$content = ''
+    $ensure  = present,
+    $target  = '',
+    $source  = '',
+    $content = ''
 ) {
-	file {"/etc/monit/conf.d/${name}.monitrc":
-		ensure  => $ensure,
-		owner   => 'root',
-		group   => 'root',
-		mode    => '0400',
-		notify  => Service['monit'],
-		content => $content ? {'' => undef, default => $content},
-		source  => $source ? {'' => undef, default => $source},
-		target  => $target ? {'' => undef, default => $target},
-	}
+    file {"/etc/monit/conf.d/${name}.monitrc":
+        ensure  => $ensure,
+        owner   => 'root',
+        group   => 'root',
+        mode    => '0400',
+        notify  => Service['monit'],
+    }
+
+    if $content {
+        File["/etc/monit/conf.d/${name}.monitrc"] {
+            content => $content
+        }
+    }
+    if $source {
+        File["/etc/monit/conf.d/${name}.monitrc"] {
+            source => $source
+        }
+    }
+    if $target {
+        File["/etc/monit/conf.d/${name}.monitrc"] {
+            target => $target
+        }
+    }
 }
