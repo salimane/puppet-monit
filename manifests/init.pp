@@ -6,63 +6,49 @@
 # Stig Sandbeck Mathisen <ssm@fnord.no>
 # Micah Anderson micah@riseup.net
 #
-# To set any of the following, simply set them as variables in your manifests
-# before the class is included, for example:
+# To set any of the following, simply set them as class parameters
+# for example:
 #
-# $monit_enable_httpd = yes
-# $monit_httpd_port = 8888
-# $monit_secret="something secret, something safe"
-# $monit_alert="someone@example.org"
-# $monit_mailserver="mail.example.org"
-# $monit_pool_interval="120"
+# class{'monit':
+#   alert => 'someone@example.org',
+#   mailserver => 'mail.example.com'
+# }
 #
-# include monit
+# The following is a list of the currently available parameters:
 #
-# The following is a list of the currently available variables:
+# alert:            Who should get the email notifications?
+#                   Default: root@localhost
 #
-# monit_alert:                who should get the email notifications?
-#                             Default: root@localhost
+# enable_httpd:     Should the httpd daemon be enabled?
+#                   set this to 'yes' to enable it, be sure
+#                   you have set the $monit_default_secret
+#                   Valid values: yes or no
+#                   Default: no
 #
-# monit_enable_httpd:         should the httpd daemon be enabled?
-#                             set this to 'yes' to enable it, be sure
-#                             you have set the $monit_default_secret
-#                             Valid values: yes or no
-#                             Default: no
-#
-# monit_httpd_port:           what port should the httpd run on?
-#                             Default: 2812
+# httpd_port:       What port should the httpd run on?
+#                   Default: 2812
 #
 #
-# monit_mailserver:           where should monit be sending mail?
-#                             set this to the mailserver
-#                             Default: localhost
+# mailserver:       Where should monit be sending mail?
+#                   set this to the mailserver
+#                   Default: localhost
 #
-# monit_pool_interval:        how often (in seconds) should monit poll?
-#                             Default: 120
+# pool_interval:    How often (in seconds) should monit poll?
+#                   Default: 120
+#
+# secret:           The secret for the httpd daemon. Please set it!
+#                   Default: "This is not very secret, is it?"
 #
 
-class monit {
+class monit (
+    $enable_httpd  = 'no',
+    $httpd_port    = 2812,
+    $secret        = 'This is not very secret, is it?',
+    $alert         = 'root@localhost',
+    $mailserver    = 'localhost',
+    $pool_interval = '120'
+){
 
-
-    # The monit_secret is used with the fqdn of the host to make a
-    # password for the monit http server.
-    $monit_default_secret='This is not very secret, is it?'
-
-    # The default alert recipient.  You can override this by setting the
-    # variable "$monit_alert" in your node specification.
-    $monit_default_alert='root@localhost'
-
-    # How often should the daemon pool? Interval in seconds.
-    case $monit_pool_interval {
-        '': { $monit_pool_interval = '120' }
-        default: {}
-    }
-
-    # Should the httpd daemon be enabled, or not? By default it is not
-    case $monit_enable_httpd {
-        '': { $monit_enable_httpd = 'no' }
-        default: {}
-    }
     # The package
     package { 'monit':
         ensure => installed,
@@ -106,6 +92,7 @@ class monit {
 
     # The main configuration file
     file { '/etc/monit/monitrc':
+        ensure  => present,
         content => template('monit/monitrc.erb'),
     }
 
@@ -114,7 +101,7 @@ class monit {
         'debian': {
             file { '/etc/default/monit':
                 content => "startup=1\n
-                CHECK_INTERVALS=${monit_pool_interval}\n",
+                CHECK_INTERVALS=${pool_interval}\n",
                 before  => Service['monit']
             }
         }
@@ -125,6 +112,6 @@ class monit {
     # A template configuration snippet.  It would need to be included,
     # since monit's "include" statement cannot handle an empty directory.
     monit::snippet{ 'monit_template':
-        source => "puppet://${server}/modules/monit/template.monitrc",
+        source => "puppet://${::server}/modules/monit/template.monitrc",
     }
 }
