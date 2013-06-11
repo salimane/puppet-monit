@@ -57,6 +57,7 @@ class monit (
     # The service
     service { 'monit':
         ensure  => running,
+        enable  => true,
         require => Package['monit'],
     }
 
