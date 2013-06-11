@@ -25,6 +25,13 @@
 #                   Valid values: yes or no
 #                   Default: no
 #
+# user:       		The user that could access the httpd daemon.
+#                   Default: monit
+#
+#
+# password:       	The password for the httpd daemon.
+#                   Default: pwd
+#
 # httpd_port:       What port should the httpd run on?
 #                   Default: 2812
 #
@@ -36,14 +43,13 @@
 # pool_interval:    How often (in seconds) should monit poll?
 #                   Default: 120
 #
-# secret:           The secret for the httpd daemon. Please set it!
-#                   Default: "This is not very secret, is it?"
 #
 
 class monit (
     $enable_httpd  = 'no',
     $httpd_port    = 2812,
-    $secret        = 'This is not very secret, is it?',
+    $user          = 'monit',
+    $password      = 'pwd',
     $alert         = 'root@localhost',
     $mailserver    = 'localhost',
     $pool_interval = '120'
@@ -103,7 +109,7 @@ class monit (
             file { '/etc/default/monit':
                 content => "startup=1\n
                 CHECK_INTERVALS=${pool_interval}\n",
-                before  => Service['monit']
+                notify  => Service['monit']
             }
         }
         default: {

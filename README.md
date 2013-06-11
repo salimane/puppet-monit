@@ -17,7 +17,8 @@ Add the following to your node manifest:
 class {'monit':
     $enable_httpd  = 'no',
     $httpd_port    = 2812,
-    $secret        = 'This is not very secret, is it?',
+	$user          = 'monit',
+    $password      = 'pwd',
     $alert         = 'root@localhost',
     $mailserver    = 'localhost',
     $pool_interval = '120'

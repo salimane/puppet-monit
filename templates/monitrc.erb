@@ -7,11 +7,8 @@ set alert <%= @alert %>
 
 <% if @enable_httpd == 'yes' then -%>
     set httpd port <%= @httpd_port %> and use address localhost
-    allow localhost
-    <%
-        require 'digest/sha1'
-    -%>
-    allow monit:<%= Digest::SHA1.hexdigest(@secret.to_s + Digest::SHA1.hexdigest(@secret.to_s + @fqdn.to_s)) %>
+        allow localhost
+        allow <%= @user %>:<%= @password %>
 <% end -%>
 
 set daemon <%= @pool_interval %>
