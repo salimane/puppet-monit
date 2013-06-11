@@ -94,12 +94,17 @@ class monit {
 			mode    => 0700,
 	}
 
-	# The configuration snippet directory.  Other packages can put
-	# *.monitrc files into this directory, and monit will include them.
-	file { "/etc/monit/conf.d":
-			ensure  => directory,
-			mode    => 0700,
-	}
+    # The configuration snippet directory.  Other packages can put
+    # *.monitrc files into this directory, and monit will include them.
+    file { '/etc/monit/conf.d':
+        ensure  => directory,
+        mode    => '0700',
+        source  => "puppet:///monit/empty/",
+        recurse => true,
+        purge   => true,
+        force   => true,
+        ignore  => '.ignore';
+    }
 
 	# The main configuration file
 	file { "/etc/monit/monitrc":
