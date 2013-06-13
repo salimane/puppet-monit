@@ -2,12 +2,16 @@
 # Creates a monit process check,
 #
 # Parameters:
-#   namevar     - the name of this resource will be the process name
-#   pidfile     - the pidfile monit will check
-#   start       - the command used by monit to start the service
-#   stop        - the command used by monit to stop the service
-#   customlines - lets you inject custom lines into the monitrc snippet,
-#            just pass an array, and it will appear in the configuration file
+#   ensure 			-  ensure/absent this monit conf
+#   process     	- the name of this resource will be the process name, (optional) default: name of this ressouce
+#   group  			- the monit group (optional)
+#   pidfile     	- the pidfile monit will check
+#   start       	- the command used by monit to start the service
+#   start_extras	- extras options for the start command (optional)
+#   stop        	- the command used by monit to stop the service
+#   stop_extras     - extras options for the stop command (optional)
+#   customlines 	- lets you inject custom lines into the monitrc snippet,
+#            			just pass an array, and it will appear in the configuration file
 #
 # Actions:
 #   The following actions gets taken by this defined type:
@@ -31,6 +35,7 @@
 define monit::check::process(
     $ensure       = present,
     $process      = $name,
+    $group        = undef,
     $pidfile      = "/var/run/${name}.pid",
     $start        = "/etc/init.d/${name} start",
     $start_extras = '',
