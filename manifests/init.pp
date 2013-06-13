@@ -113,7 +113,7 @@ class monit (
         'debian': {
             file { '/etc/default/monit':
                 content => "startup=1\n
-                CHECK_INTERVALS=${pool_interval}\nSTART=yes\n",
+                CHECK_INTERVALS=${pool_interval}\n",
                 notify  => Service['monit']
             }
         }
